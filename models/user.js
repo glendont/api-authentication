@@ -32,6 +32,15 @@ userSchema.pre("save", async function (next) {
   }
 });
 
+userSchema.methods.isValidPassword = async function (enterPassword) {
+  try {
+    const passwordMatch = await bcrypt.compare(enterPassword, this.password);
+    return passwordMatch; // True if matches
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
 // Create a model
 // Argument = name (in singular)
 // Model
