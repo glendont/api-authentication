@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcryptjs");
 const Schema = mongoose.Schema;
 
 // Create a Schema
@@ -13,6 +14,22 @@ const userSchema = new Schema({
     type: String,
     required: true,
   },
+});
+
+// Mongoose functionality which allows us to run a function before something happens.
+userSchema.pre("save", async function (next) {
+  // In this, we want this function to run before the userschema is saved
+  try {
+    // Generate a salt
+    const salt = await bcrypt.genSalt(10);
+    // Hash password with salt
+    const passwordHash = await bcrypt.hash(this.password, salt);
+    // Store hashed password instead of original password
+    this.password = passwordHash;
+    next();
+  } catch (error) {
+    next(error);
+  }
 });
 
 // Create a model
