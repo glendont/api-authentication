@@ -24,6 +24,6 @@ app.use(bodyParser.json());
 app.use("/users", require("./routes/users"));
 
 // Start the Server
-const port = process.env.PORT || 3000;
+const port = process.env.PORT || 5000;
 app.listen(port);
 console.log(`Server listening at ${port}`);
