@@ -3,6 +3,7 @@ const JwtStrategy = require("passport-jwt").Strategy;
 const { ExtractJwt } = require("passport-jwt");
 const LocalStrategy = require("passport-local").Strategy;
 const GooglePlusTokenStrategy = require("passport-google-plus-token");
+const FacebookTokenStrategy = require("passport-facebook-token");
 const User = require("./models/user");
 
 // JSON WEB TOKEN STRATEGY
@@ -82,10 +83,48 @@ passport.use(
           console.log("User already exist in our DB");
           return done(null, existingUser);
         }
-        console.log("User doesn't exist - We are creating a new one");
+        console.log(
+          "User doesn't exist - We are creating a new one with Google Account"
+        );
         const newUser = new User({
           method: "google",
           google: {
+            id: profile.id,
+            email: profile.emails[0].value,
+          },
+        });
+
+        await newUser.save();
+        done(null, newUser);
+      } catch (error) {
+        done(error, false, error.message);
+      }
+    }
+  )
+);
+
+// Facebook OAuth Strategy
+
+passport.use(
+  "facebookToken",
+  new FacebookTokenStrategy(
+    {
+      clientID: "757282805017535",
+      clientSecret: "f8d2f9e4c85bffbde724e081841f3fb0",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      try {
+        const existingUser = await User.findOne({ "facebook.id": profile.id });
+        if (existingUser) {
+          console.log("User already exist in our DB");
+          return done(null, existingUser);
+        }
+        console.log(
+          "User doesn't exist - We are creating a new one with Facebook Account"
+        );
+        const newUser = User({
+          method: "facebook",
+          facebook: {
             id: profile.id,
             email: profile.emails[0].value,
           },

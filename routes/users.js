@@ -32,4 +32,11 @@ router
     UsersController.googleOAuth
   );
 
+router
+  .route("/oauth/facebook")
+  .post(
+    passport.authenticate("facebookToken", { session: false }),
+    UsersController.facebookOAuth
+  );
+
 module.exports = router;
