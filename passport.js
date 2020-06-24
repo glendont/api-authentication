@@ -36,9 +36,11 @@ passport.use(
       usernameField: "email",
     },
     async (email, password, done) => {
+      console.log("email");
+
       try {
         // Find the user given the email
-        const user = await User.findOne({ email });
+        const user = await User.findOne({ "local.email": email });
 
         // If not, handle it
         if (!user) {
@@ -46,6 +48,7 @@ passport.use(
         }
         // Check if the password is correct
         const isMatch = await user.isValidPassword(password);
+        console.log(isMatch);
         if (isMatch) {
           return done(null, user);
         } else {
@@ -68,9 +71,31 @@ passport.use(
       clientSecret: "0l_5L3H8hOsk8EOqILued0Ik",
     },
     async (accessToken, refreshToken, profile, done) => {
-      console.log("AccessToken", accessToken);
-      console.log("Refresh Token", refreshToken);
-      console.log("Profile", profile);
+      try {
+        console.log("AccessToken", accessToken);
+        console.log("Refresh Token", refreshToken);
+        console.log("Profile", profile);
+
+        // Check whether this current user exists in our Database
+        const existingUser = await User.findOne({ "google.id": profile.id });
+        if (existingUser) {
+          console.log("User already exist in our DB");
+          return done(null, existingUser);
+        }
+        console.log("User doesn't exist - We are creating a new one");
+        const newUser = new User({
+          method: "google",
+          google: {
+            id: profile.id,
+            email: profile.emails[0].value,
+          },
+        });
+
+        await newUser.save();
+        done(null, newUser);
+      } catch (error) {
+        done(error, false, error.message);
+      }
     }
   )
 );

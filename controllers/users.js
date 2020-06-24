@@ -21,15 +21,18 @@ module.exports = {
     console.log(`contents of req.value.body`, req.value.body);
 
     // Check if there is an existing user with the same email
-    const foundUser = await User.findOne({ email: email });
+    const foundUser = await User.findOne({ "local.email": email });
     if (foundUser) {
       return res.status(403).json({ error: "Email is already in use" });
     }
 
     // Create a new user
     const newUser = new User({
-      email,
-      password,
+      method: "local",
+      local: {
+        email: email,
+        password: password,
+      },
     });
 
     await newUser.save();
@@ -47,6 +50,14 @@ module.exports = {
     const token = signToken(req.user);
 
     console.log("Successful Login");
+    res.status(200).json({ token });
+  },
+
+  googleOAuth: async (req, res, next) => {
+    // Generate Token
+    console.log("req.user", req.user);
+    const token = signToken(req.user);
+
     res.status(200).json({ token });
   },
 

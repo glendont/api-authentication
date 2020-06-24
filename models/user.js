@@ -50,7 +50,7 @@ userSchema.pre("save", async function (next) {
     // Hash password with salt
     const passwordHash = await bcrypt.hash(this.local.password, salt);
     // Store hashed password instead of original password
-    this.password = passwordHash;
+    this.local.password = passwordHash;
     next();
   } catch (error) {
     next(error);
