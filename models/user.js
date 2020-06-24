@@ -4,15 +4,37 @@ const Schema = mongoose.Schema;
 
 // Create a Schema
 const userSchema = new Schema({
-  email: {
+  method: {
     type: String,
+    enum: ["local", "google", "facebook"],
     required: true,
-    unique: true,
-    lowercase: true,
   },
-  password: {
-    type: String,
-    required: true,
+  local: {
+    email: {
+      type: String,
+      lowercase: true,
+    },
+    password: {
+      type: String,
+    },
+  },
+  google: {
+    id: {
+      type: String,
+    },
+    email: {
+      type: String,
+      lowercase: true,
+    },
+  },
+  facebook: {
+    id: {
+      type: String,
+    },
+    email: {
+      type: String,
+      lowercase: true,
+    },
   },
 });
 
@@ -20,10 +42,13 @@ const userSchema = new Schema({
 userSchema.pre("save", async function (next) {
   // In this, we want this function to run before the userschema is saved
   try {
+    if (this.method !== "local") {
+      next();
+    }
     // Generate a salt
     const salt = await bcrypt.genSalt(10);
     // Hash password with salt
-    const passwordHash = await bcrypt.hash(this.password, salt);
+    const passwordHash = await bcrypt.hash(this.local.password, salt);
     // Store hashed password instead of original password
     this.password = passwordHash;
     next();
@@ -34,7 +59,10 @@ userSchema.pre("save", async function (next) {
 
 userSchema.methods.isValidPassword = async function (enterPassword) {
   try {
-    const passwordMatch = await bcrypt.compare(enterPassword, this.password);
+    const passwordMatch = await bcrypt.compare(
+      enterPassword,
+      this.local.password
+    );
     return passwordMatch; // True if matches
   } catch (error) {
     throw new Error(error);

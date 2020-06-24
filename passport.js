@@ -2,6 +2,7 @@ const passport = require("passport");
 const JwtStrategy = require("passport-jwt").Strategy;
 const { ExtractJwt } = require("passport-jwt");
 const LocalStrategy = require("passport-local").Strategy;
+const GooglePlusTokenStrategy = require("passport-google-plus-token");
 const User = require("./models/user");
 
 // JSON WEB TOKEN STRATEGY
@@ -53,6 +54,23 @@ passport.use(
       } catch (error) {
         done(error, false);
       }
+    }
+  )
+);
+
+// Google OAuth Strategy
+passport.use(
+  "googleToken",
+  new GooglePlusTokenStrategy(
+    {
+      clientID:
+        "595923078814-a7342ipt4287c0grf1rdefd7mqe59fud.apps.googleusercontent.com",
+      clientSecret: "0l_5L3H8hOsk8EOqILued0Ik",
+    },
+    async (accessToken, refreshToken, profile, done) => {
+      console.log("AccessToken", accessToken);
+      console.log("Refresh Token", refreshToken);
+      console.log("Profile", profile);
     }
   )
 );

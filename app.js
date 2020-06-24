@@ -1,8 +1,10 @@
+// Packages
 const express = require("express");
 const morgan = require("morgan");
 const bodyParser = require("body-parser");
 const mongoose = require("mongoose");
 
+// Init mongoose
 mongoose.Promise = global.Promise;
 mongoose.connect("mongodb://localhost/APIAuthentication", {
   useNewUrlParser: true,
@@ -13,7 +15,9 @@ mongoose.connect("mongodb://localhost/APIAuthentication", {
 const app = express();
 
 // Middlewares
-app.use(morgan("dev"));
+if (!process.env.NODE_ENV === "test") {
+  app.use(morgan("dev"));
+}
 app.use(bodyParser.json());
 
 // Routes
