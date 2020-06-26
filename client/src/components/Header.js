@@ -20,7 +20,7 @@ class Header extends Component {
       >
         <Link className="navbar-brand" to="/">
           {" "}
-          Loco Loco API Authentication{" "}
+          Locolocal Authentication{" "}
         </Link>
         <div className="collapse navbar-collapse">
           <ul className="navbar-nav mr-auto">

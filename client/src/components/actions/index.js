@@ -1,5 +1,11 @@
 import axios from "axios";
-import { AUTH_SIGN_UP, AUTH_ERROR, AUTH_SIGN_OUT, AUTH_SIGN_IN } from "./types";
+import {
+  AUTH_SIGN_UP,
+  AUTH_ERROR,
+  AUTH_SIGN_OUT,
+  AUTH_SIGN_IN,
+  GET_SECRET,
+} from "./types";
 
 export const oauthGoogle = (data) => {
   return async (dispatch) => {
@@ -13,6 +19,7 @@ export const oauthGoogle = (data) => {
       payload: res.data.token,
     });
     localStorage.setItem("JWT_TOKEN", res.data.token);
+    axios.defaults.headers.common["Authorization"] = res.data.token;
   };
 };
 
@@ -28,6 +35,7 @@ export const oauthFacebook = (data) => {
       payload: res.data.token,
     });
     localStorage.setItem("JWT_TOKEN", res.data.token);
+    axios.defaults.headers.common["Authorization"] = res.data.token;
   };
 };
 
@@ -49,6 +57,7 @@ export const signUp = (data) => {
       });
       // Step 4: Save jwtToken to LocalStorage
       localStorage.setItem("JWT_TOKEN", res.data.token);
+      axios.defaults.headers.common["Authorization"] = res.data.token;
     } catch (err) {
       dispatch({
         type: AUTH_ERROR,
@@ -62,7 +71,7 @@ export const signUp = (data) => {
 export const signOut = () => {
   return (dispatch) => {
     localStorage.removeItem("JWT_TOKEN");
-
+    axios.defaults.headers.common["Authorization"] = "";
     dispatch({
       type: AUTH_SIGN_OUT,
       payload: "",
@@ -88,12 +97,28 @@ export const signIn = (data) => {
       });
       // Step 4: Save jwtToken to LocalStorage
       localStorage.setItem("JWT_TOKEN", res.data.token);
+      axios.defaults.headers.common["Authorization"] = res.data.token;
     } catch (err) {
       dispatch({
         type: AUTH_ERROR,
         payload: "Email and password combination not valid",
       });
       console.error("err", err);
+    }
+  };
+};
+
+export const getSecret = () => {
+  return async (dispatch) => {
+    try {
+      const res = await axios.get("http://localhost:5000/users/secret");
+      console.log("res", res);
+      dispatch({
+        type: GET_SECRET,
+        payload: res.data.secret,
+      });
+    } catch (error) {
+      console.error("err", error);
     }
   };
 };
