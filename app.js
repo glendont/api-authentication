@@ -11,9 +11,16 @@ mongoose.connect("mongodb://localhost/APIAuthentication", {
   useNewUrlParser: true,
   useUnifiedTopology: true,
 });
-
+// Init localhost
+const fs = require("fs");
+// const key = fs.readFileSync("./rootCA.pem");
+// const cert = fs.readFileSync("./rootCA.key");
+// const https = require("https");
 // init express app
 const app = express();
+// const server = https.createServer({ key: key, cert: cert }, app);
+
+// https.createServer(ssl, app).listen(3000);
 
 app.use(cors());
 // Middlewares
